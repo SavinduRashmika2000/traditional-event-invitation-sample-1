@@ -38,8 +38,49 @@ export default function LotusParticles() {
     window.addEventListener("resize", handleResize);
     handleResize();
 
+    // Device performance adaptability: reduce count on mobile
+    const isMobile = window.innerWidth < 768;
+    const particleCount = isMobile ? 18 : 45;
+
+    // Create Offscreen Canvases to cache graphics and prevent recalculating gradients and bezier paths on every frame
+    const petalCache = document.createElement("canvas");
+    petalCache.width = 40;
+    petalCache.height = 40;
+    const pCtx = petalCache.getContext("2d");
+    if (pCtx) {
+      pCtx.translate(20, 20);
+      pCtx.beginPath();
+      pCtx.moveTo(0, -16);
+      pCtx.quadraticCurveTo(12, -3, 0, 16);
+      pCtx.quadraticCurveTo(-12, -3, 0, -16);
+      
+      const grad = pCtx.createLinearGradient(0, -16, 0, 16);
+      grad.addColorStop(0, "rgba(240, 190, 185, 1)");
+      grad.addColorStop(1, "rgba(217, 168, 160, 0.85)");
+      pCtx.fillStyle = grad;
+      pCtx.fill();
+      
+      pCtx.strokeStyle = "rgba(200, 164, 93, 0.4)";
+      pCtx.lineWidth = 0.75;
+      pCtx.stroke();
+    }
+
+    const goldCache = document.createElement("canvas");
+    goldCache.width = 20;
+    goldCache.height = 20;
+    const gCtx = goldCache.getContext("2d");
+    if (gCtx) {
+      const grad = gCtx.createRadialGradient(10, 10, 0, 10, 10, 10);
+      grad.addColorStop(0, "rgba(232, 211, 167, 1)");
+      grad.addColorStop(0.3, "rgba(200, 164, 93, 0.8)");
+      grad.addColorStop(1, "rgba(200, 164, 93, 0)");
+      gCtx.fillStyle = grad;
+      gCtx.beginPath();
+      gCtx.arc(10, 10, 10, 0, Math.PI * 2);
+      gCtx.fill();
+    }
+
     // Initialize particles
-    const particleCount = 45;
     for (let i = 0; i < particleCount; i++) {
       particles.push(createParticle(true));
     }
@@ -47,88 +88,56 @@ export default function LotusParticles() {
     function createParticle(randomY = false): Particle {
       const w = canvas?.width || window.innerWidth;
       const h = canvas?.height || window.innerHeight;
-      const type = Math.random() > 0.4 ? "gold" : "petal";
+      const type = Math.random() > 0.45 ? "gold" : "petal";
       
       return {
         x: Math.random() * w,
-        y: randomY ? Math.random() * h : -20,
+        y: randomY ? Math.random() * h : -25,
         size: type === "petal" ? Math.random() * 8 + 6 : Math.random() * 2 + 1,
-        speedY: type === "petal" ? Math.random() * 0.8 + 0.4 : Math.random() * 0.5 + 0.2,
-        speedX: Math.random() * 0.4 - 0.2,
+        speedY: type === "petal" ? Math.random() * 0.7 + 0.4 : Math.random() * 0.4 + 0.2,
+        speedX: Math.random() * 0.3 - 0.15,
         rotation: Math.random() * Math.PI * 2,
         rotationSpeed: (Math.random() * 0.02 - 0.01) * 0.5,
-        opacity: Math.random() * 0.5 + 0.3,
+        opacity: Math.random() * 0.5 + 0.35,
         type,
         swing: Math.random() * Math.PI * 2,
-        swingSpeed: Math.random() * 0.01 + 0.005,
+        swingSpeed: Math.random() * 0.008 + 0.004,
       };
-    }
-
-    function drawPetal(ctx: CanvasRenderingContext2D, x: number, y: number, size: number, rotation: number, opacity: number) {
-      ctx.save();
-      ctx.translate(x, y);
-      ctx.rotate(rotation);
-      ctx.beginPath();
-      
-      // Draw stylized lotus petal shape using bezier curves
-      ctx.moveTo(0, -size);
-      ctx.quadraticCurveTo(size * 0.7, -size * 0.2, 0, size);
-      ctx.quadraticCurveTo(-size * 0.7, -size * 0.2, 0, -size);
-      
-      // Soft Rose color gradient
-      const gradient = ctx.createLinearGradient(0, -size, 0, size);
-      gradient.addColorStop(0, `rgba(240, 190, 185, ${opacity})`);
-      gradient.addColorStop(1, `rgba(217, 168, 160, ${opacity * 0.8})`);
-      
-      ctx.fillStyle = gradient;
-      ctx.fill();
-      
-      // Fine gold border outline for premium feel
-      ctx.strokeStyle = `rgba(200, 164, 93, ${opacity * 0.3})`;
-      ctx.lineWidth = 0.5;
-      ctx.stroke();
-      
-      ctx.restore();
-    }
-
-    function drawGoldSpark(ctx: CanvasRenderingContext2D, x: number, y: number, size: number, opacity: number) {
-      ctx.save();
-      ctx.beginPath();
-      ctx.arc(x, y, size, 0, Math.PI * 2);
-      
-      // Gold glowing aura
-      const radialGrad = ctx.createRadialGradient(x, y, 0, x, y, size * 2.5);
-      radialGrad.addColorStop(0, `rgba(232, 211, 167, ${opacity})`);
-      radialGrad.addColorStop(0.3, `rgba(200, 164, 93, ${opacity * 0.8})`);
-      radialGrad.addColorStop(1, `rgba(200, 164, 93, 0)`);
-      
-      ctx.fillStyle = radialGrad;
-      ctx.fill();
-      ctx.restore();
     }
 
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      particles.forEach((p, idx) => {
-        // Move particle
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
         p.y += p.speedY;
-        
+
+        ctx.save();
+        ctx.globalAlpha = p.opacity;
+
         if (p.type === "petal") {
           p.swing += p.swingSpeed;
-          p.x += p.speedX + Math.sin(p.swing) * 0.3;
+          p.x += p.speedX + Math.sin(p.swing) * 0.25;
           p.rotation += p.rotationSpeed;
-          drawPetal(ctx, p.x, p.y, p.size, p.rotation, p.opacity);
+          
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rotation);
+          // Draw pre-rendered cached petal
+          ctx.drawImage(petalCache, -p.size, -p.size, p.size * 2, p.size * 2);
         } else {
-          p.x += p.speedX + Math.cos(p.y * 0.01) * 0.1;
-          drawGoldSpark(ctx, p.x, p.y, p.size, p.opacity);
+          p.x += p.speedX + Math.cos(p.y * 0.008) * 0.08;
+          // Draw pre-rendered cached spark (which is 20x20 in size, so size controls scaling)
+          const renderSize = p.size * 2.5;
+          ctx.drawImage(goldCache, p.x - renderSize, p.y - renderSize, renderSize * 2, renderSize * 2);
         }
+        
+        ctx.restore();
 
-        // Recycle particles when they go out of screen
-        if (p.y > canvas.height + 20 || p.x < -20 || p.x > canvas.width + 20) {
-          particles[idx] = createParticle(false);
+        // Recycle out of screen particles
+        if (p.y > canvas.height + 25 || p.x < -25 || p.x > canvas.width + 25) {
+          particles[i] = createParticle(false);
         }
-      });
+      }
 
       animationFrameId = requestAnimationFrame(animate);
     };

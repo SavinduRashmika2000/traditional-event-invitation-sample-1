@@ -2,15 +2,20 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import dynamic from "next/dynamic";
+
+// Static import for the initial fold experience to render immediately
 import OilLampIntro from "@/components/OilLampIntro";
-import LotusParticles from "@/components/LotusParticles";
-import HeroSection from "@/components/HeroSection";
-import EventDetails from "@/components/EventDetails";
-import ShowcaseSection from "@/components/ShowcaseSection";
-import HeritageStory from "@/components/HeritageStory";
-import PhotoGallery from "@/components/PhotoGallery";
-import SpecialMessage from "@/components/SpecialMessage";
-import Footer from "@/components/Footer";
+
+// Dynamically import below-the-fold components to improve initial load speed (FCP / LCP)
+const LotusParticles = dynamic(() => import("@/components/LotusParticles"), { ssr: false });
+const HeroSection = dynamic(() => import("@/components/HeroSection"), { ssr: false });
+const EventDetails = dynamic(() => import("@/components/EventDetails"), { ssr: false });
+const ShowcaseSection = dynamic(() => import("@/components/ShowcaseSection"), { ssr: false });
+const HeritageStory = dynamic(() => import("@/components/HeritageStory"), { ssr: false });
+const PhotoGallery = dynamic(() => import("@/components/PhotoGallery"), { ssr: false });
+const SpecialMessage = dynamic(() => import("@/components/SpecialMessage"), { ssr: false });
+const Footer = dynamic(() => import("@/components/Footer"), { ssr: false });
 
 export default function Home() {
   const [showIntro, setShowIntro] = useState(true);
