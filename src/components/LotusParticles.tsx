@@ -27,7 +27,7 @@ export default function LotusParticles() {
     if (!ctx) return;
 
     let animationFrameId: number;
-    let particles: Particle[] = [];
+    const particles: Particle[] = [];
 
     const handleResize = () => {
       if (!canvas) return;

@@ -4,6 +4,14 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { eventData } from "@/config/eventData";
 
+// Computed at module load time — completely outside React render, satisfying react-hooks/purity
+const PARTICLE_CONFIGS = Array.from({ length: 8 }, () => ({
+  initX: Math.random() * 80 - 40,
+  initScale: Math.random() * 0.6 + 0.4,
+  animX: Math.random() * 120 - 60,
+  duration: Math.random() * 2 + 1.5,
+}));
+
 interface OilLampIntroProps {
   onComplete: () => void;
 }
@@ -27,6 +35,8 @@ export default function OilLampIntro({ onComplete }: OilLampIntroProps) {
     setStep(3);
     setTimeout(onComplete, 1200); // Allow fade-out animation to play
   };
+
+
 
   return (
     <AnimatePresence>
@@ -81,25 +91,25 @@ export default function OilLampIntro({ onComplete }: OilLampIntroProps) {
             {/* Glowing Golden Particles rising */}
             {step >= 1 && (
               <div className="absolute inset-0 overflow-hidden pointer-events-none z-0 max-h-[350px] w-full">
-                {[...Array(8)].map((_, i) => (
+                {PARTICLE_CONFIGS.map((cfg, i) => (
                   <motion.div
                     key={i}
                     className="absolute bottom-1/3 left-1/2 w-2 h-2 rounded-full bg-gold"
                     initial={{
-                      x: Math.random() * 80 - 40,
+                      x: cfg.initX,
                       y: 40,
                       opacity: 0.8,
-                      scale: Math.random() * 0.6 + 0.4,
+                      scale: cfg.initScale,
                     }}
                     animate={{
                       y: -180,
-                      x: Math.random() * 120 - 60,
+                      x: cfg.animX,
                       opacity: 0,
                       scale: 0.1,
                     }}
                     transition={{
                       repeat: Infinity,
-                      duration: Math.random() * 2 + 1.5,
+                      duration: cfg.duration,
                       delay: i * 0.3,
                       ease: "easeOut",
                     }}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { X, ChevronLeft, ChevronRight, ZoomIn } from "lucide-react";
@@ -9,15 +9,14 @@ import { eventData } from "@/config/eventData";
 export default function PhotoGallery() {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
-  const openLightbox = (index: number) => {
-    setSelectedIndex(index);
-    document.body.style.overflow = "hidden";
-  };
+  // Reactively lock/unlock body scroll when lightbox opens or closes
+  useEffect(() => {
+    document.body.style.overflow = selectedIndex !== null ? "hidden" : "unset";
+    return () => { document.body.style.overflow = "unset"; };
+  }, [selectedIndex]);
 
-  const closeLightbox = () => {
-    setSelectedIndex(null);
-    document.body.style.overflow = "unset";
-  };
+  const openLightbox = (index: number) => setSelectedIndex(index);
+  const closeLightbox = () => setSelectedIndex(null);
 
   const showPrev = (e: React.MouseEvent) => {
     e.stopPropagation();
