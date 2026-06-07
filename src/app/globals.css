@@ -1,0 +1,124 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ivory: #FFFDF8;
+  --color-cream: #F8F4EB;
+  --color-gold: #C8A45D;
+  --color-bronze: #B88A44;
+  --color-brown: #5C4033;
+  --color-gray-warm: #6B6158;
+  --color-rose-soft: #D9A8A0;
+  
+  --font-abhaya: var(--font-abhaya);
+  --font-noto-serif: var(--font-noto-serif);
+}
+
+:root {
+  --background: #FFFDF8; /* Soft Ivory */
+  --foreground: #5C4033; /* Deep Brown */
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-noto-serif), Arial, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Custom premium scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #FFFDF8;
+}
+::-webkit-scrollbar-thumb {
+  background: #C8A45D;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #B88A44;
+}
+
+/* Premium Visual Utilities */
+.paper-texture {
+  background-color: #FFFDF8;
+  background-image: 
+    radial-gradient(rgba(200, 164, 93, 0.03) 1px, transparent 0),
+    radial-gradient(rgba(200, 164, 93, 0.02) 2px, transparent 0);
+  background-size: 24px 24px, 48px 48px;
+  background-position: 0 0, 12px 12px;
+}
+
+.gold-gradient {
+  background: linear-gradient(135deg, #C8A45D 0%, #B88A44 50%, #E8D3A7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.gold-border {
+  border-image: linear-gradient(to right, #B88A44, #C8A45D, #E8D3A7, #C8A45D, #B88A44) 1;
+}
+
+/* Elegant Sri Lankan Temple Decorative Border Frame */
+.cultural-border-frame {
+  position: relative;
+  border: 2px solid #C8A45D;
+  margin: 1rem;
+  padding: 1.5rem;
+}
+
+.cultural-border-frame::before,
+.cultural-border-frame::after {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #B88A44;
+}
+
+/* Corner decorations */
+.cultural-border-frame::before {
+  top: -6px;
+  left: -6px;
+  border-right: none;
+  border-bottom: none;
+}
+
+.cultural-border-frame::after {
+  bottom: -6px;
+  right: -6px;
+  border-left: none;
+  border-top: none;
+}
+
+/* Floating animation utilities */
+@keyframes slow-float {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-15px) rotate(3deg);
+  }
+}
+
+.animate-float-slow {
+  animation: slow-float 8s ease-in-out infinite;
+}
+
+.animate-float-slower {
+  animation: slow-float 12s ease-in-out infinite;
+}
+
+.gold-glow {
+  box-shadow: 0 0 30px 5px rgba(200, 164, 93, 0.15);
+}
+
+.gold-glow-intense {
+  box-shadow: 0 0 40px 10px rgba(200, 164, 93, 0.35);
+}
+
+/* Smooth reveal transitions */
+.reveal-transition {
+  transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
